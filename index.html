@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0">
+<title>Picker</title>
+<style>
+body {
+    background:#FFF;
+    color:#000;
+    font-family:verdana, sans-serif;
+    font-size:10pt;
+    margin:0;
+    padding:10px;
+}
+
+a:link, a:visited {
+    color:#008;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+a:active, a:hover {
+    color:#ACF;
+}
+
+.info {
+    font-weight:bold;
+}
+
+button {
+    font-family:inherit;
+    cursor:pointer;
+    border:0;
+    border-radius:3px;
+    padding:0.3em 0.5em;
+    background:#CCC;
+    color:#000;
+}
+
+button:hover {
+    background:#DDD;
+}
+
+button.disabled {
+    background:#DDD;
+    color:#888;
+    cursor:not-allowed;
+}
+
+button.disabled:hover {
+    background:#DDD;
+}
+
+.collapsible {
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 400px;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+.active, .collapsible:hover {
+  background-color: #555;
+}
+
+.content {
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: #f1f1f1;
+}
+
+#container {
+    position:relative;
+    margin-left:-10px;
+    margin-right:-10px;
+    padding:10px;
+    overflow:hidden;
+}
+@media (min-width:1024px) {
+    /* Put the found favorites beside the picking div when the window is sufficiently large */
+    #picking {
+        float:left;
+        width:636px;
+    }
+
+    #secondary {
+        margin-left:646px;
+    }
+}
+
+@media (min-width:1300px) {
+    /* Once we get to the point where 636px is less than half of the width of the screen, make the picking div just take up half */
+    #picking {
+        width:50%;
+    }
+
+    #secondary {
+        margin-left:51%;
+    }
+}
+
+#pick {
+    background:#58F;
+    color:#FFF;
+    font-size:larger;
+    font-weight:bold;
+    width:6em;
+    border-radius:5px;
+    margin-right:10px;
+}
+
+#pick.disabled {
+    background:#ACF;
+}
+
+#pick:hover {
+    background:#ACF;
+}
+
+.item-list {
+    padding:0;
+    list-style-type:none;
+    line-height:100px;
+}
+
+.item-list li {
+    margin:0;
+    display:inline-block;
+    height:100px;
+    width:100px;
+    line-height:100px;
+    border:3px solid transparent;
+    text-align:center;
+    position:relative;
+    vertical-align:top;
+    overflow:hidden;
+    border-radius:100%;
+    background:#F7F7F7;
+    color:#000;
+}
+
+.item-list li img {
+    vertical-align:middle;
+    max-height:100%;
+    max-width:100%;
+}
+
+.item-list li span {
+    display:inline-block;
+    vertical-align:middle;
+    line-height:1.2;
+}
+
+@media (max-width:636px) {
+    .item-list {
+        line-height:75px;
+    }
+
+    .item-list li {
+        line-height:75px;
+        height:75px;
+        width:75px;
+    }
+}
+
+@media (max-width:423px) {
+    .item-list {
+        line-height:50px;
+    }
+
+    .item-list li {
+        line-height:50px;
+        height:50px;
+        width:50px;
+    }
+}
+
+#evaluating li {
+    cursor:pointer;
+}
+
+#favorites li {
+    cursor:move;
+}
+
+.item-list li:hover {
+    background:#CDF;
+}
+
+.item-list.sorting li:hover {
+    background:#F7F7F7;
+}
+
+#evaluating li.selected {
+    border:3px solid #7AC;
+}
+
+#evaluating, #buttons {
+    text-align:center;
+    margin:auto;
+}
+
+#evaluating li.notice {
+    width:auto;
+    height:auto;
+    max-width:260px;
+    margin:auto;
+    background:#F7F7F7;
+    border-radius:10px;
+    padding:30px 30px;
+    color:#000;
+    text-align:center;
+    line-height:1.4;
+    cursor:auto;
+    font-size:10pt;
+}
+
+#buttons {
+    margin-top:30px;
+    position:relative;
+    z-index:3;
+}
+</style>
+</head>
+<body>
+<h1>Eurovision Favourites Picker</h1>
+
+<b>Your current progress is being saved.</b>
+
+<p>For each group of songs presented to you, click one or more of your favorites from that group and press the "Pick" button.<br>
+Eventually, your favorite song will start appearing under "Found Favorites". You can continue as long as you like to construct an arbitrarily long list of your favorite songs ranked.</p>
+<p>In principle, this picker is perfectly accurate, provided you pick consistently - you'll correctly get your second favorite second, even if it's pitted against your absolute favorite early on, for instance. Click here for more on how this tool works.<br>
+You can reorder your favorites after you've found them, but in principle you shouldn't need to.</p>
+<p>Want to create your own favorite picker? <a href="https://github.com/antialiasis/favorite-picker">It's on GitHub with instructions to get you started.</a></p>
+
+<div class="form">
+    <label for="max-batch-size">Maximum number of songs shown at a time: </label>
+    <input type="number" id="max-batch-size">
+</div>
+
+<p>Include years:
+    <label><input type="checkbox" name="year" class="year" value="2000"> 2000</label>
+    <label><input type="checkbox" name="year" class="year" value="2001"> 2001</label>
+    <label><input type="checkbox" name="year" class="year" value="2002"> 2002</label>
+    <label><input type="checkbox" name="year" class="year" value="2003"> 2003</label>
+    <label><input type="checkbox" name="year" class="year" value="2004"> 2004</label>
+    <label><input type="checkbox" name="year" class="year" value="2005"> 2005</label>
+    <label><input type="checkbox" name="year" class="year" value="2006"> 2006</label>
+    <label><input type="checkbox" name="year" class="year" value="2007"> 2007</label>
+    <label><input type="checkbox" name="year" class="year" value="2008"> 2008</label>
+    <label><input type="checkbox" name="year" class="year" value="2009"> 2009</label>
+</p>
+
+<div id="container">
+
+    <div id="picking">
+        <ul id="evaluating" class="item-list">
+        </ul>
+
+        <p id="buttons"><button id="pick">Pick</button> <button id="pass">Pass</button> <button id="undo">Undo</button> <button id="redo">Redo</button> <button id="reset">Reset</button></p>
+    </div>
+
+    <div id="secondary">
+        <h2>Found favorites</h2>
+
+        <ol id="favorites" class="item-list">
+        </ol>
+    </div>
+</div>
+
+<button type="button" class="collapsible">Open Collapsible</button>
+<div class="content">
+  <p>Lorem ipsum...</p>
+</div>
+
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script src="picker.js"></script>
+<script src="picker-ui.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.7.0/Sortable.min.js"></script>
+<script>
+'use strict';
+
+var items = [
+    { id: 'Sameach'  , year: "2000"},
+    { id: 'No Goodbyes'  , year: "2000"},
+    { id: "Don't Play That Song Again"  , year: "2000"},
+    { id: 'Once in a Lifetime'  , year: "2000"},
+    { id: 'On aura le ciel'  , year: "2000"},
+    { id: 'The Moon'  , year: "2000"},
+    { id: 'Desire'  , year: "2000"},
+    { id: 'My Heart Goes Boom'  , year: "2000"},
+    { id: 'Solo'  , year: "2000"},
+    { id: 'Envie de vivre'  , year: "2000"},
+    { id: 'N&#243miza'  , year: "2000"},
+    { id: 'Tell Me!'  , year: "2000"},
+    { id: 'Colgado de un sue&#241o'  , year: "2000"},
+    { id: 'Fly on the Wings of Love'  , year: "2000"},
+    { id: 'Wadde hadde dudde da?'  , year: "2000"},
+    { id: "La vita cos'&#232"  , year: "2000"},
+    { id: 'Kad zaspu an&#273eli'  , year: "2000"},
+    { id: 'When Spirits Are Calling My Name'  , year: "2000"},
+    { id: '100% te ljubam'  , year: "2000"},
+    { id: 'A Little Bit'  , year: "2000"},
+    { id: 'My Star'  , year: "2000"},
+    { id: 'Yorgunum Anla'  , year: "2000"},
+    { id: 'Millenium of Love'  , year: "2000"},
+    { id: 'All To You'  , year: "2000"},
+    { id: 'Out On My Own'  , year: "2001"},
+    { id: 'Angel (Iceland)'  , year: "2001"},
+    { id: 'Hano'  , year: "2001"},
+    { id: 'On My Own'  , year: "2001"},
+    { id: 'En davar'  , year: "2001"},
+    { id: 'Lady Alpine Blue'  , year: "2001"},
+    { id: 'Listen To Your Heartbeat'  , year: "2001"},
+    { id: 'You Got Style'  , year: "2001"},
+    { id: 'Too Much'  , year: "2001"},
+    { id: 'Strings of My Heart'  , year: "2001"},
+    { id: 'Eu s&#243 sei ser feliz assim'  , year: "2001"},
+    { id: 'Without Your Love (Ireland)'  , year: "2001"},
+    { id: 'Dile que la quiero'  , year: "2001"},
+    { id: "Je n'ai que mon &#226me"  , year: "2001"},
+    { id: 'Sevgiliye son'  , year: "2001"},
+    { id: 'No Dream Impossible'  , year: "2001"},
+    { id: 'Energy'  , year: "2001"},
+    { id: '2 Long'  , year: "2001"},
+    { id: 'Wer Liebe lebt'  , year: "2001"},
+    { id: 'Everybody'  , year: "2001"},
+    { id: 'Another Summer Night'  , year: "2001"},
+    { id: 'Die for You'  , year: "2001"},
+    { id: 'Never Ever Let You Go'  , year: "2001"},
+    { id: 'Gimme'  , year: "2002"},
+    { id: 'Come Back'  , year: "2002"},
+    { id: 'Say a Word'  , year: "2002"},
+    { id: 'S.A.G.A.P.O'  , year: "2002"},
+    { id: "Europe's Living a Celebration"  , year: "2002"},
+    { id: 'Everything I Want'  , year: "2002"},
+    { id: 'Northern Girl'  , year: "2002"},
+    { id: 'Runaway'  , year: "2002"},
+    { id: 'Od nas zavisi'  , year: "2002"},
+    { id: 'Light a Candle'  , year: "2002"},
+    { id: 'Dans le jardin de mon &#226me'  , year: "2002"},
+    { id: 'Never Let It Go'  , year: "2002"},
+    { id: 'Addicted to You'  , year: "2002"},
+    { id: 'Tell Me Who You Are'  , year: "2002"},
+    { id: 'Na jastuku za dvoje'  , year: "2002"},
+    { id: 'Sister'  , year: "2002"},
+    { id: 'Il faut du temps'  , year: "2002"},
+    { id: "I Can't Live Without Music"  , year: "2002"},
+    { id: 'Leylakar soldu kalbinde'  , year: "2002"},
+    { id: '7th Wonder'  , year: "2002"},
+    { id: 'Tell Me Why'  , year: "2002"},
+    { id: 'Samo ljubezen'  , year: "2002"},
+    { id: 'I Wanna'  , year: "2002"},
+    { id: 'Happy You'  , year: "2002"},
+    { id: 'Open Your Heart'  , year: "2003"},
+    { id: 'Weil der Mensch z&#228hlt'  , year: "2003"},
+    { id: "We've Got The World"  , year: "2003"},
+    { id: 'Everyway That I Can'  , year: "2003"},
+    { id: 'To Dream Again'  , year: "2003"},
+    { id: 'Ne brini'  , year: "2003"},
+    { id: 'Deixa-me sonhar'  , year: "2003"},
+    { id: 'Vi&#353e nisam tvoja'  , year: "2003"},
+    { id: 'Feeling Alive'  , year: "2003"},
+    { id: "Let's Get Happy"  , year: "2003"},
+    { id: "Ne ver', ne boysia"  , year: "2003"},
+    { id: 'Dime'  , year: "2003"},
+    { id: 'Words For Love'  , year: "2003"},
+    { id: 'One More Night'  , year: "2003"},
+    { id: 'Cry Baby'  , year: "2003"},
+    { id: 'Hasta la Vista (Ukraine)'  , year: "2003"},
+    { id: 'Never Let You Go (Greece)'  , year: "2003"},
+    { id: "I'm Not Afraid To Move On"  , year: "2003"},
+    { id: 'Monts et merveilles'  , year: "2003"},
+    { id: 'Keine Grenzen - zadnych granic'  , year: "2003"},
+    { id: 'Hello From Mars'  , year: "2003"},
+    { id: 'Sanomi'  , year: "2003"},
+    { id: 'Eighties Coming Back'  , year: "2003"},
+    { id: "Don't Break My Heart"  , year: "2003"},
+    { id: 'Give Me Your Love'  , year: "2003"},
+    { id: 'Nanana'  , year: "2003"},
+    { id: 'Takes 2 To Tango'  , year: "2004"},
+    { id: 'My Galileo'  , year: "2004"},
+    { id: 'Celebrate!'  , year: "2004"},
+    { id: 'Dziesma par laimi'  , year: "2004"},
+    { id: "Leha'amin"  , year: "2004"},
+    { id: 'Jugarem a estimar-nos'  , year: "2004"},
+    { id: 'Foi magia'  , year: "2004"},
+    { id: 'On Again... Off'  , year: "2004"},
+    { id: 'Notre plan&#232te'  , year: "2004"},
+    { id: 'Shake It'  , year: "2004"},
+    { id: 'Wild Dances'  , year: "2004"},
+    { id: "What's Happened to Your Love?"  , year: "2004"},
+    { id: 'The Image of You'  , year: "2004"},
+    { id: 'Stronger Every Minute'  , year: "2004"},
+    { id: 'Life'  , year: "2004"},
+    { id: 'Stay Forever'  , year: "2004"},
+    { id: 'Tii'  , year: "2004"},
+    { id: 'You Are the Only One'  , year: "2004"},
+    { id: 'Shame On You'  , year: "2004"},
+    { id: 'Lane moje'  , year: "2004"},
+    { id: 'Without You'  , year: "2004"},
+    { id: 'Para llenarme de ti'  , year: "2004"},
+    { id: 'Du bist'  , year: "2004"},
+    { id: 'High'  , year: "2004"},
+    { id: '&#192 chaque pas'  , year: "2004"},
+    { id: "Can't Wait Until Tonight"  , year: "2004"},
+    { id: 'In the Disco'  , year: "2004"},
+    { id: '1 Life'  , year: "2004"},
+    { id: 'Believe Me'  , year: "2004"},
+    { id: 'Heaven'  , year: "2004"},
+    { id: 'If My World Stopped Turning'  , year: "2004"},
+    { id: 'Love Song'  , year: "2004"},
+    { id: 'Hold Onto Our Love'  , year: "2004"},
+    { id: 'For Real'  , year: "2004"},
+    { id: 'I Admit'  , year: "2004"},
+    { id: 'It Hurts'  , year: "2004"},
+    { id: '	Y as&#237'  , year: "2005"},
+    { id: 'Little by Little'  , year: "2005"},
+    { id: 'Amar'  , year: "2005"},
+    { id: 'Boonika bate toba'  , year: "2005"},
+    { id: 'The War is not Over'  , year: "2005"},
+    { id: 'Tout de moi'  , year: "2005"},
+    { id: "Hasheket Shenish'ar"  , year: "2005"},
+    { id: 'Love me Tonight'  , year: "2005"},
+    { id: 'My Impossible Dream'  , year: "2005"},
+    { id: 'If I Had Your Love'  , year: "2005"},
+    { id: 'Le Grand Soir'  , year: "2005"},
+    { id: "Let's Get Loud"  , year: "2005"},
+    { id: 'In My Dreams'  , year: "2005"},
+    { id: 'Let Me Try'  , year: "2005"},
+    { id: 'Forogj, vil&#225g!'  , year: "2005"},
+    { id: 'Why?'  , year: "2005"},
+    { id: 'Make My Day'  , year: "2005"},
+    { id: 'La mirada interior'  , year: "2005"},
+    { id: 'Cool Vibes'  , year: "2005"},
+    { id: 'Vukovi umiru sami'  , year: "2005"},
+    { id: 'Lorraine'  , year: "2005"},
+    { id: 'Love?'  , year: "2005"},
+    { id: 'Stop'  , year: "2005"},
+    { id: 'Talking to You'  , year: "2005"},
+    { id: 'Czarna dziewczyna'  , year: "2005"},
+    { id: 'Touch My Fire'  , year: "2005"},
+    { id: 'Angel (Malta)'  , year: "2005"},
+    { id: 'Rimi rimi ley'  , year: "2005"},
+    { id: 'Tomorrow I Go'  , year: "2005"},
+    { id: '&#201la &#201la'  , year: "2005"},
+    { id: 'Brujer&#237a'  , year: "2005"},
+    { id: 'Zauvijek moja'  , year: "2005"},
+    { id: 'Las Vegas'  , year: "2005"},
+    { id: 'Razom nas bahato'  , year: "2005"},
+    { id: 'Run & Hide'  , year: "2005"},
+    { id: 'My Number One'  , year: "2005"},
+    { id: 'Nobody Hurt No On'  , year: "2005"},
+    { id: 'Call Me'  , year: "2005"},
+    { id: 'Chacun pense &#224 soi'  , year: "2005"},
+    { id: 'Without Your Love (Armenia)'  , year: "2006"},
+    { id: 'Let Me Cry'  , year: "2006"},
+    { id: 'Mr. Nobody'  , year: "2006"},
+    { id: 'Sense tu'  , year: "2006"},
+    { id: 'Mum'  , year: "2006"},
+    { id: 'Zjarr e fthoht&#235'  , year: "2006"},
+    { id: "Je t'adore"  , year: "2006"},
+    { id: 'Every song is a cry for love'  , year: "2006"},
+    { id: 'Why angels cry'  , year: "2006"},
+    { id: 'La coco-dance'  , year: "2006"},
+    { id: 'Ninanajna'  , year: "2006"},
+    { id: 'Follow My Heart'  , year: "2006"},
+    { id: 'Never Let You Go (Russia)'  , year: "2006"},
+    { id: 'S&#252per star'  , year: "2006"},
+    { id: 'Show Me Your Love'  , year: "2006"},
+    { id: 'Hard Rock Hallelujah'  , year: "2006"},
+    { id: 'Amambanda'  , year: "2006"},
+    { id: 'We Are the Winners'  , year: "2006"},
+    { id: 'Coisas de nada'  , year: "2006"},
+    { id: 'Invincible'  , year: "2006"},
+    { id: 'Through My Window'  , year: "2006"},
+    { id: 'Lejla'  , year: "2006"},
+    { id: 'Congratulations'  , year: "2006"},
+    { id: 'If We All Give a Little'  , year: "2006"},
+    { id: 'Loca'  , year: "2006"},
+    { id: 'Together We Are One'  , year: "2006"},
+    { id: 'I Hear Your Heart'  , year: "2006"},
+    { id: 'Alvedansen'  , year: "2006"},
+    { id: 'Un Blodymary'  , year: "2006"},
+    { id: 'I Do'  , year: "2006"},
+    { id: 'No No Never'  , year: "2006"},
+    { id: 'Twist of Love'  , year: "2006"},
+    { id: 'Torner&#242'  , year: "2006"},
+    { id: 'Teenage Life'  , year: "2006"},
+    { id: 'Everything'  , year: "2006"},
+    { id: 'Il &#233tait temps'  , year: "2006"},
+    { id: 'Moja &#353tikla'  , year: "2006"},
+    { id: 'Water'  , year: "2007"},
+    { id: 'Push the Button'  , year: "2007"},
+    { id: 'Comme ci, comme &#231a'  , year: "2007"},
+    { id: 'Work Your Magic'  , year: "2007"},
+    { id: 'Valentine Lost'  , year: "2007"},
+    { id: 'Visionary Dream'  , year: "2007"},
+    { id: 'Ajde, kro&#269i'  , year: "2007"},
+    { id: 'Vampires Are Alive'  , year: "2007"},
+    { id: 'Fight'  , year: "2007"},
+    { id: 'On Top of the World'  , year: "2007"},
+    { id: 'Hear My Plea'  , year: "2007"},
+    { id: 'Drama Queen'  , year: "2007"},
+    { id: 'Vjerumjem u ljubav'  , year: "2007"},
+    { id: 'Time To Party'  , year: "2007"},
+    { id: 'Molitva'  , year: "2007"},
+    { id: 'Mal&#225 d&#225ma'  , year: "2007"},
+    { id: 'Dan&#231a comigo'  , year: "2007"},
+    { id: 'Mojot svet'  , year: "2007"},
+    { id: 'Ven a bailar conmigo'  , year: "2007"},
+    { id: 'Vertigo'  , year: "2007"},
+    { id: 'Salvem al m&#243n'  , year: "2007"},
+    { id: 'Unsubstantial Blues'  , year: "2007"},
+    { id: 'Partners in Crime'  , year: "2007"},
+    { id: 'Love Power'  , year: "2007"},
+    { id: 'Cvet z juga'  , year: "2007"},
+    { id: 'Shake It Up, &#350ekerim'  , year: "2007"},
+    { id: 'Get a Life - Get Alive'  , year: "2007"},
+    { id: 'Questa notte'  , year: "2007"},
+    { id: 'Rijeka bez imena'  , year: "2007"},
+    { id: 'I Love You Mi Vida'  , year: "2007"},
+    { id: "They Can't Stop The Spring"  , year: "2007"},
+    { id: 'Leave Me Alone'  , year: "2007"},
+    { id: 'Love or Leave'  , year: "2007"},
+    { id: 'Ya sou, Maria'  , year: "2007"},
+    { id: 'The Worrying Kind'  , year: "2007"},
+    { id: "L'Amour &#224 la fran&#231aise"  , year: "2007"},
+    { id: 'Song N&deg1'  , year: "2007"},
+    { id: "Frauen regier'n die Welt"  , year: "2007"},
+    { id: 'Dancing Lasha Tumbai'  , year: "2007"},
+    { id: 'Flying the Flag(For You)'  , year: "2007"},
+    { id: 'Liubi, Liubi, I Love You'  , year: "2007"},
+    { id: 'Anytime You Need'  , year: "2007"},
+    { id: 'This Is My Life'  , year: "2008"},
+    { id: 'Hero'  , year: "2008"},
+    { id: 'Deli'  , year: "2008"},
+    { id: 'Shady Lady'  , year: "2008"},
+    { id: 'Nomads in the Night'  , year: "2008"},
+    { id: 'Zemr&#235n e lam&#235 peng'  , year: "2008"},
+    { id: 'Era stupendo'  , year: "2008"},
+    { id: 'Have Some Fun'  , year: "2008"},
+    { id: 'Hasta La Vista (Belarus)'  , year: "2008"},
+    { id: 'Wolves of the Sea'  , year: "2008"},
+    { id: 'Romanca'  , year: "2008"},
+    { id: 'DJ, Take Me Away'  , year: "2008"},
+    { id: 'All Night Long'  , year: "2008"},
+    { id: 'Peace Will Come'  , year: "2008"},
+    { id: 'Candlelight'  , year: "2008"},
+    { id: 'Vodka'  , year: "2008"},
+    { id: 'Femme fatale'  , year: "2008"},
+    { id: 'Let Me Love You'  , year: "2008"},
+    { id: 'Senhora do mar (Negras &#225guas)'  , year: "2008"},
+    { id: 'Zauvijek volim te'  , year: "2008"},
+    { id: 'The Fire In Your Eyes'  , year: "2008"},
+    { id: 'Leto svet'  , year: "2008"},
+    { id: 'A Century of Love'  , year: "2008"},
+    { id: 'Complice'  , year: "2008"},
+    { id: 'O Julissi'  , year: "2008"},
+    { id: 'Day After Day'  , year: "2008"},
+    { id: 'Vrag naj vzame'  , year: "2008"},
+    { id: 'Hold On, Be Strong'  , year: "2008"},
+    { id: 'For Life'  , year: "2008"},
+    { id: 'Ireland Douze pointe'  , year: "2008"},
+    { id: 'Casanova'  , year: "2008"},
+    { id: 'Poku&#353aj'  , year: "2008"},
+    { id: 'Qele, qele'  , year: "2008"},
+    { id: 'Your Heart Belongs to Me'  , year: "2008"},
+    { id: 'Miss&#228 miehet ratsastaa'  , year: "2008"},
+    { id: 'Pe-o margine de lume'  , year: "2008"},
+    { id: 'Believe'  , year: "2008"},
+    { id: 'Secret Combination'  , year: "2008"},
+    { id: 'Even If'  , year: "2008"},
+    { id: 'Disappear'  , year: "2008"},
+    { id: 'Divine'  , year: "2008"},
+    { id: 'Baila el Chiki-chiki'  , year: "2008"},
+    { id: 'Oro'  , year: "2008"},
+    { id: 'Just Get Out of My Life'  , year: "2009"},
+    { id: 'Aven Romale'  , year: "2009"},
+    { id: 'Copycat'  , year: "2009"},
+    { id: 'Eyes That Never Lie'  , year: "2009"},
+    { id: 'La voix'  , year: "2009"},
+    { id: 'Jan Jan'  , year: "2009"},
+    { id: 'La teva decisi&#243 (Get a Life)'  , year: "2009"},
+    { id: 'The Highest Hights'  , year: "2009"},
+    { id: 'D&#252m Tek Tek'  , year: "2009"},
+    { id: 'There Must Be ANother Way'  , year: "2009"},
+    { id: 'Illusion'  , year: "2009"},
+    { id: 'Is It True?'  , year: "2009"},
+    { id: 'Ne&#353to &#353to kje ostane'  , year: "2009"},
+    { id: 'The Balkan Girls'  , year: "2009"},
+    { id: 'Lose Control'  , year: "2009"},
+    { id: 'Todos as ruas do amor'  , year: "2009"},
+    { id: 'What If We'  , year: "2009"},
+    { id: 'Bistra voda'  , year: "2009"},
+    { id: 'Lijepa Tena'  , year: "2009"},
+    { id: 'Et cetera'  , year: "2009"},
+    { id: 'Probka'  , year: "2009"},
+    { id: 'Cipela'  , year: "2009"},
+    { id: "I Don't Wanna Leave"  , year: "2009"},
+    { id: 'Fairytale'  , year: "2009"},
+    { id: 'Firefly'  , year: "2009"},
+    { id: "Let' tmou"  , year: "2009"},
+    { id: 'Believe Again'  , year: "2009"},
+    { id: 'Love Symphony'  , year: "2009"},
+    { id: 'Dance with Me'  , year: "2009"},
+    { id: 'Always'  , year: "2009"},
+    { id: 'This Is Our Night'  , year: "2009"},
+    { id: 'Love'  , year: "2009"},
+    { id: 'Hora din Moldova'  , year: "2009"},
+    { id: 'Carry Me in Your Dream'  , year: "2009"},
+    { id: 'Be My Valentine(Anti-Crisis Girl)'  , year: "2009"},
+    { id: 'R&#228ndajad'  , year: "2009"},
+    { id: 'Shine'  , year: "2009"},
+    { id: "Et s'il fallait le faire"  , year: "2009"},
+    { id: "Mamo"  , year: "2009"},
+    { id: "Miss Kiss Kiss Bang"  , year: "2009"},
+    { id: "It's My Time"  , year: "2009"},
+    { id: 'La noche es para m&#237'  , year: "2009"}
+];
+
+var myPicker = new picker.Picker({
+    items: items,
+    localStorageKey: 'picker-state',
+    defaultSettings: {
+        minBatchSize: 3,
+        maxBatchSize: 10,
+        year: ["2009"]
+    },
+    shouldIncludeItem: function(item, settings) {
+        return settings.year.indexOf(item.year) !== -1;
+    }
+});
+
+var pickerUI = new PickerUI(myPicker, {
+    elements: {
+        pick: "#pick",
+        pass: "#pass",
+        undo: "#undo",
+        redo: "#redo",
+        reset: "#reset",
+        evaluating: "#evaluating",
+        favorites: "#favorites",
+        settings: {
+            maxBatchSize: '#max-batch-size',
+            year: '.year'
+        }
+    }
+});
+
+pickerUI.initialize();
+
+/* Sortable favorites - you can safely remove this, and the Sortable.min.js script, if you don't want to be able to sort your favorite list. */
+var sortable = new Sortable(pickerUI.elem.favorites.get(0), {
+    draggable: '.item',
+    animation: 100,
+    onStart: function() {
+        pickerUI.elem.favorites.addClass("sorting");
+    },
+    onEnd: function() {
+        pickerUI.elem.favorites.removeClass("sorting");
+    },
+    onUpdate: function() {
+        myPicker.setFavorites(pickerUI.elem.favorites.children().map(function() {
+            return pickerUI.getItem(this);
+        }).get());
+        pickerUI.update(true);
+    }
+});
+/* End sortable favorites */
+</script>
+
+<script>
+    var coll = document.getElementsByClassName("collapsible");
+    var i;
+    
+    for (i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.maxHeight){
+          content.style.maxHeight = null;
+        } else {
+          content.style.maxHeight = content.scrollHeight + "px";
+        } 
+      });
+    }
+    </script>
+
+</body>
+</html>
