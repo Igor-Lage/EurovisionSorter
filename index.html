@@ -67,6 +67,18 @@ button.disabled:hover {
   background-color: #555;
 }
 
+.collapsible:after {
+  content: '\02795'; /* Unicode character for "plus" sign (+) */
+  font-size: 13px;
+  color: white;
+  float: right;
+  margin-left: 5px;
+}
+
+.active:after {
+  content: "\2796"; /* Unicode character for "minus" sign (-) */
+}
+
 .content {
   padding: 0 18px;
   max-height: 0;
@@ -274,9 +286,18 @@ You can reorder your favorites after you've found them, but in principle you sho
     </div>
 </div>
 
-<button type="button" class="collapsible">Open Collapsible</button>
+<button type="button" class="collapsible">How It Works</button>
 <div class="content">
-  <p>Lorem ipsum...</p>
+    <h3>How It Works</h3>
+        <p>The idea for the favorite Pokémon picker is not original to me; it is inspired by an old, now-defunct original that has been recreated with upgrades <a href="http://fio4ri.github.io/FavoritePokemon/">here</a>. Basically, it would present you with a random pair of Pokémon, you'd pick the one you liked better, and that would eliminate the other Pokémon from the running and then give you another pair randomly chosen from the remaining Pokémon. Eventually, when you had eliminated every Pokémon but one, the remaining one had to be your very favorite Pokémon, and the last few you eliminated were given second to tenth place.</p>
+        
+        <p>This picker was designed to improve on this concept. The main differences are that it will present you with up to 20 songs at a time by default, which speeds up the picking process considerably, and that rather than giving second to tenth place to the last nine songs you eliminated (which leaves them partially up to chance - if the old picker happens to make you pick between your two favorites early on, your real second favorite won't even make the list), it will instead bring back all songs eliminated by your favorite and have you pick between them in the same way as before. This recursiveness also means that instead of cutting it off at top ten, you can in theory continue picking until you've ordered literally every single song into a favorites list.</p>
+        
+        <p>The basic principle driving this picker is still elimination - it just also keeps track of which songs you picked over each eliminated songs. For example, if the picker shows Molitva and Leave Me Alone, and you pick Molitva, it doesn't give Molitva points or mark it as liked somehow; it just marks Leave Me Alone as eliminated by Molitva. If you eventually go on to eliminate every song except Molitva, then Molitva will be added to your Found Favorites, and Leave Me Alone (and any other songs that were eliminated by Molitva) will be back in the running for second place. Similarly, if you had previously had a batch with Molitva, Leave Me Alone and Rijeka bez imena in it, and you picked Molitva and Leave Me Alone, then Rijeka bez imena will reappear whenever Molitva and Leave Me Alone have both been added under Found Favorites.</p>
+        
+        <p>All that picking means is therefore, "I like all of these songs better than any of those." This is intentionally a broad, flexible statement; you'll end up with the same result regardless of how many songs you choose to pick from each batch, so it's up to you how many you want to pick at a time. If you just want to get your number one favorite or a select few, it's quickest to try to pick just one song from each batch, while if you want to construct something like a top fifty list, you may want to start by picking every song that's likely to end up in that top fifty.</p>
+        
+        <p>The elimination mechanic is also why you can't pick nothing; songs can only ever be eliminated by some other songs, so that the picker can know when to bring them back. The "Pass" button is instead equivalent to picking every song in the batch, which eliminates nothing and simply means all those songs get shuffled into the next round - passing over and over won't get you anywhere, so make sure you do some actual picking.</p>
 </div>
 
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
