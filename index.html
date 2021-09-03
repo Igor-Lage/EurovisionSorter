@@ -1,246 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+<link rel="stylesheet" href="darkTheme.css" rel="stylesheet" id="theme-link">
 <meta name="viewport" content="initial-scale=1.0">
 <title>Picker</title>
-<style>
-body {
-    background:#FFF;
-    color:#000;
-    font-family:verdana, sans-serif;
-    font-size:10pt;
-    margin:0;
-    padding:10px;
-}
-
-a:link, a:visited {
-    color:#008;
-    font-weight:bold;
-    text-decoration:none;
-}
-
-a:active, a:hover {
-    color:#ACF;
-}
-
-.info {
-    font-weight:bold;
-}
-
-button {
-    font-family:inherit;
-    cursor:pointer;
-    border:0;
-    border-radius:3px;
-    padding:0.3em 0.5em;
-    background:#CCC;
-    color:#000;
-}
-
-button:hover {
-    background:#DDD;
-}
-
-button.disabled {
-    background:#DDD;
-    color:#888;
-    cursor:not-allowed;
-}
-
-button.disabled:hover {
-    background:#DDD;
-}
-
-.collapsible {
-  background-color: #777;
-  color: white;
-  cursor: pointer;
-  padding: 18px;
-  width: 400px;
-  border: none;
-  text-align: left;
-  outline: none;
-  font-size: 15px;
-}
-
-.active, .collapsible:hover {
-  background-color: #555;
-}
-
-.collapsible:after {
-  content: '\02795'; /* Unicode character for "plus" sign (+) */
-  font-size: 13px;
-  color: white;
-  float: right;
-  margin-left: 5px;
-}
-
-.active:after {
-  content: "\2796"; /* Unicode character for "minus" sign (-) */
-}
-
-.content {
-  padding: 0 18px;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.2s ease-out;
-  background-color: #f1f1f1;
-}
-
-#container {
-    position:relative;
-    margin-left:-10px;
-    margin-right:-10px;
-    padding:10px;
-    overflow:hidden;
-}
-@media (min-width:1024px) {
-    /* Put the found favorites beside the picking div when the window is sufficiently large */
-    #picking {
-        float:left;
-        width:636px;
-    }
-
-    #secondary {
-        margin-left:646px;
-    }
-}
-
-@media (min-width:1300px) {
-    /* Once we get to the point where 636px is less than half of the width of the screen, make the picking div just take up half */
-    #picking {
-        width:50%;
-    }
-
-    #secondary {
-        margin-left:51%;
-    }
-}
-
-#pick {
-    background:#58F;
-    color:#FFF;
-    font-size:larger;
-    font-weight:bold;
-    width:6em;
-    border-radius:5px;
-    margin-right:10px;
-}
-
-#pick.disabled {
-    background:#ACF;
-}
-
-#pick:hover {
-    background:#ACF;
-}
-
-.item-list {
-    padding:0;
-    list-style-type:none;
-    line-height:100px;
-}
-
-.item-list li {
-    margin:0;
-    display:inline-block;
-    height:100px;
-    width:100px;
-    line-height:100px;
-    border:3px solid transparent;
-    text-align:center;
-    position:relative;
-    vertical-align:top;
-    overflow:hidden;
-    border-radius:100%;
-    background:#F7F7F7;
-    color:#000;
-}
-
-.item-list li img {
-    vertical-align:middle;
-    max-height:100%;
-    max-width:100%;
-}
-
-.item-list li span {
-    display:inline-block;
-    vertical-align:middle;
-    line-height:1.2;
-}
-
-@media (max-width:636px) {
-    .item-list {
-        line-height:75px;
-    }
-
-    .item-list li {
-        line-height:75px;
-        height:75px;
-        width:75px;
-    }
-}
-
-@media (max-width:423px) {
-    .item-list {
-        line-height:50px;
-    }
-
-    .item-list li {
-        line-height:50px;
-        height:50px;
-        width:50px;
-    }
-}
-
-#evaluating li {
-    cursor:pointer;
-}
-
-#favorites li {
-    cursor:move;
-}
-
-.item-list li:hover {
-    background:#CDF;
-}
-
-.item-list.sorting li:hover {
-    background:#F7F7F7;
-}
-
-#evaluating li.selected {
-    border:3px solid #7AC;
-}
-
-#evaluating, #buttons {
-    text-align:center;
-    margin:auto;
-}
-
-#evaluating li.notice {
-    width:auto;
-    height:auto;
-    max-width:260px;
-    margin:auto;
-    background:#F7F7F7;
-    border-radius:10px;
-    padding:30px 30px;
-    color:#000;
-    text-align:center;
-    line-height:1.4;
-    cursor:auto;
-    font-size:10pt;
-}
-
-#buttons {
-    margin-top:30px;
-    position:relative;
-    z-index:3;
-}
-</style>
 </head>
 <body>
+
+    <button class="btn-toggle" style="float: right;">Toggle/Untoggle Dark-Mode</button>
+
 <h1>Eurovision Favourites Picker</h1>
 
 <b>Your current progress is being saved.</b>
@@ -267,6 +35,8 @@ You can reorder your favorites after you've found them, but in principle you sho
     <label><input type="checkbox" name="year" class="year" value="2007"> 2007</label>
     <label><input type="checkbox" name="year" class="year" value="2008"> 2008</label>
     <label><input type="checkbox" name="year" class="year" value="2009"> 2009</label>
+    <!--<label><input type="checkbox" id="secondChance"> Second Chance</label>
+    <label><input type="checkbox" id="final"> Final</label>-->
 </p>
 
 <div id="container">
@@ -477,7 +247,7 @@ var items = [
     { id: 'Razom nas bahato'  , year: "2005"},
     { id: 'Run & Hide'  , year: "2005"},
     { id: 'My Number One'  , year: "2005"},
-    { id: 'Nobody Hurt No On'  , year: "2005"},
+    { id: 'Nobody Hurt No One'  , year: "2005"},
     { id: 'Call Me'  , year: "2005"},
     { id: 'Chacun pense &#224 soi'  , year: "2005"},
     { id: 'Without Your Love (Armenia)'  , year: "2006"},
@@ -494,27 +264,27 @@ var items = [
     { id: 'Follow My Heart'  , year: "2006"},
     { id: 'Never Let You Go (Russia)'  , year: "2006"},
     { id: 'S&#252per star'  , year: "2006"},
-    { id: 'Show Me Your Love'  , year: "2006"},
-    { id: 'Hard Rock Hallelujah'  , year: "2006"},
+    { id: 'Show Me Your Love'  , year: "2006", final: true},
+    { id: 'Hard Rock Hallelujah'  , year: "2006", secondChance: true},
     { id: 'Amambanda'  , year: "2006"},
     { id: 'We Are the Winners'  , year: "2006"},
     { id: 'Coisas de nada'  , year: "2006"},
     { id: 'Invincible'  , year: "2006"},
     { id: 'Through My Window'  , year: "2006"},
-    { id: 'Lejla'  , year: "2006"},
+    { id: 'Lejla'  , year: "2006", final: true},
     { id: 'Congratulations'  , year: "2006"},
     { id: 'If We All Give a Little'  , year: "2006"},
     { id: 'Loca'  , year: "2006"},
     { id: 'Together We Are One'  , year: "2006"},
     { id: 'I Hear Your Heart'  , year: "2006"},
-    { id: 'Alvedansen'  , year: "2006"},
+    { id: 'Alvedansen'  , year: "2006", secondChance: true},
     { id: 'Un Blodymary'  , year: "2006"},
     { id: 'I Do'  , year: "2006"},
     { id: 'No No Never'  , year: "2006"},
     { id: 'Twist of Love'  , year: "2006"},
     { id: 'Torner&#242'  , year: "2006"},
     { id: 'Teenage Life'  , year: "2006"},
-    { id: 'Everything'  , year: "2006"},
+    { id: 'Everything'  , year: "2006", secondChance: true},
     { id: 'Il &#233tait temps'  , year: "2006"},
     { id: 'Moja &#353tikla'  , year: "2006"},
     { id: 'Water'  , year: "2007"},
@@ -531,7 +301,7 @@ var items = [
     { id: 'Drama Queen'  , year: "2007"},
     { id: 'Vjerumjem u ljubav'  , year: "2007"},
     { id: 'Time To Party'  , year: "2007"},
-    { id: 'Molitva'  , year: "2007"},
+    { id: 'Molitva'  , year: "2007", final: true},
     { id: 'Mal&#225 d&#225ma'  , year: "2007"},
     { id: 'Dan&#231a comigo'  , year: "2007"},
     { id: 'Mojot svet'  , year: "2007"},
@@ -541,28 +311,28 @@ var items = [
     { id: 'Unsubstantial Blues'  , year: "2007"},
     { id: 'Partners in Crime'  , year: "2007"},
     { id: 'Love Power'  , year: "2007"},
-    { id: 'Cvet z juga'  , year: "2007"},
+    { id: 'Cvet z juga'  , year: "2007", secondChance: true},
     { id: 'Shake It Up, &#350ekerim'  , year: "2007"},
     { id: 'Get a Life - Get Alive'  , year: "2007"},
     { id: 'Questa notte'  , year: "2007"},
     { id: 'Rijeka bez imena'  , year: "2007"},
     { id: 'I Love You Mi Vida'  , year: "2007"},
     { id: "They Can't Stop The Spring"  , year: "2007"},
-    { id: 'Leave Me Alone'  , year: "2007"},
+    { id: 'Leave Me Alone'  , year: "2007", final: true},
     { id: 'Love or Leave'  , year: "2007"},
-    { id: 'Ya sou, Maria'  , year: "2007"},
+    { id: 'Ya sou, Maria'  , year: "2007", secondChance: true},
     { id: 'The Worrying Kind'  , year: "2007"},
     { id: "L'Amour &#224 la fran&#231aise"  , year: "2007"},
     { id: 'Song N&deg1'  , year: "2007"},
     { id: "Frauen regier'n die Welt"  , year: "2007"},
-    { id: 'Dancing Lasha Tumbai'  , year: "2007"},
+    { id: 'Dancing Lasha Tumbai'  , year: "2007", secondChance: true},
     { id: 'Flying the Flag(For You)'  , year: "2007"},
     { id: 'Liubi, Liubi, I Love You'  , year: "2007"},
     { id: 'Anytime You Need'  , year: "2007"},
     { id: 'This Is My Life'  , year: "2008"},
     { id: 'Hero'  , year: "2008"},
     { id: 'Deli'  , year: "2008"},
-    { id: 'Shady Lady'  , year: "2008"},
+    { id: 'Shady Lady'  , year: "2008", final: true},
     { id: 'Nomads in the Night'  , year: "2008"},
     { id: 'Zemr&#235n e lam&#235 peng'  , year: "2008"},
     { id: 'Era stupendo'  , year: "2008"},
@@ -577,7 +347,7 @@ var items = [
     { id: 'Vodka'  , year: "2008"},
     { id: 'Femme fatale'  , year: "2008"},
     { id: 'Let Me Love You'  , year: "2008"},
-    { id: 'Senhora do mar (Negras &#225guas)'  , year: "2008"},
+    { id: 'Senhora do mar (Negras &#225guas)'  , year: "2008", secondChance: true},
     { id: 'Zauvijek volim te'  , year: "2008"},
     { id: 'The Fire In Your Eyes'  , year: "2008"},
     { id: 'Leto svet'  , year: "2008"},
@@ -591,29 +361,29 @@ var items = [
     { id: 'Ireland Douze pointe'  , year: "2008"},
     { id: 'Casanova'  , year: "2008"},
     { id: 'Poku&#353aj'  , year: "2008"},
-    { id: 'Qele, qele'  , year: "2008"},
+    { id: 'Qele, qele'  , year: "2008", secondChance: true},
     { id: 'Your Heart Belongs to Me'  , year: "2008"},
     { id: 'Miss&#228 miehet ratsastaa'  , year: "2008"},
     { id: 'Pe-o margine de lume'  , year: "2008"},
     { id: 'Believe'  , year: "2008"},
-    { id: 'Secret Combination'  , year: "2008"},
+    { id: 'Secret Combination'  , year: "2008", secondChance: true},
     { id: 'Even If'  , year: "2008"},
     { id: 'Disappear'  , year: "2008"},
     { id: 'Divine'  , year: "2008"},
     { id: 'Baila el Chiki-chiki'  , year: "2008"},
-    { id: 'Oro'  , year: "2008"},
+    { id: 'Oro'  , year: "2008", final: true},
     { id: 'Just Get Out of My Life'  , year: "2009"},
     { id: 'Aven Romale'  , year: "2009"},
     { id: 'Copycat'  , year: "2009"},
     { id: 'Eyes That Never Lie'  , year: "2009"},
     { id: 'La voix'  , year: "2009"},
-    { id: 'Jan Jan'  , year: "2009"},
+    { id: 'Jan Jan'  , year: "2009", secondChance: true},
     { id: 'La teva decisi&#243 (Get a Life)'  , year: "2009"},
     { id: 'The Highest Hights'  , year: "2009"},
-    { id: 'D&#252m Tek Tek'  , year: "2009"},
-    { id: 'There Must Be ANother Way'  , year: "2009"},
+    { id: 'D&#252m Tek Tek'  , year: "2009", secondChance: true},
+    { id: 'There Must Be Another Way'  , year: "2009"},
     { id: 'Illusion'  , year: "2009"},
-    { id: 'Is It True?'  , year: "2009"},
+    { id: 'Is It True?'  , year: "2009", final: true},
     { id: 'Ne&#353to &#353to kje ostane'  , year: "2009"},
     { id: 'The Balkan Girls'  , year: "2009"},
     { id: 'Lose Control'  , year: "2009"},
@@ -625,7 +395,7 @@ var items = [
     { id: 'Probka'  , year: "2009"},
     { id: 'Cipela'  , year: "2009"},
     { id: "I Don't Wanna Leave"  , year: "2009"},
-    { id: 'Fairytale'  , year: "2009"},
+    { id: 'Fairytale'  , year: "2009", final: true},
     { id: 'Firefly'  , year: "2009"},
     { id: "Let' tmou"  , year: "2009"},
     { id: 'Believe Again'  , year: "2009"},
@@ -637,7 +407,7 @@ var items = [
     { id: 'Hora din Moldova'  , year: "2009"},
     { id: 'Carry Me in Your Dream'  , year: "2009"},
     { id: 'Be My Valentine(Anti-Crisis Girl)'  , year: "2009"},
-    { id: 'R&#228ndajad'  , year: "2009"},
+    { id: 'R&#228ndajad'  , year: "2009", secondChance: true},
     { id: 'Shine'  , year: "2009"},
     { id: "Et s'il fallait le faire"  , year: "2009"},
     { id: "Mamo"  , year: "2009"},
@@ -655,7 +425,7 @@ var myPicker = new picker.Picker({
         year: ["2009"]
     },
     shouldIncludeItem: function(item, settings) {
-        return settings.year.indexOf(item.year) !== -1;
+        return (settings.year.indexOf(item.year) !== -1) || (settings.secondChance && item.secondChance) || (settings.final && item.final);
     }
 });
 
@@ -670,7 +440,9 @@ var pickerUI = new PickerUI(myPicker, {
         favorites: "#favorites",
         settings: {
             maxBatchSize: '#max-batch-size',
-            year: '.year'
+            year: '.year',
+            secondChance: '#secondChance',
+            final: '#final'
         }
     }
 });
@@ -713,6 +485,26 @@ var sortable = new Sortable(pickerUI.elem.favorites.get(0), {
       });
     }
     </script>
+
+<script>
+    // Select the button
+const btn = document.querySelector(".btn-toggle");
+// Select the stylesheet <link>
+const theme = document.querySelector("#theme-link");
+
+// Listen for a click on the button
+btn.addEventListener("click", function() {
+  // If the current URL contains "lightTheme.css"
+  if (theme.getAttribute("href") == "lightTheme.css") {
+    // ... then switch it to "darkTheme.css"
+    theme.href = "darkTheme.css";
+  // Otherwise...
+  } else {
+    // ... switch it to "lightTheme.css"
+    theme.href = "lightTheme.css";
+  }
+});
+</script>
 
 </body>
 </html>
