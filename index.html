@@ -7,7 +7,7 @@
 </head>
 <body>
 
-    <button class="btn-toggle" style="float: right;">Toggle/Untoggle Dark-Mode</button>
+    <button class="btn-toggle" style="float: right;" onclick="changeTheme()" id="toggle">Toggle Light Mode</button>
 
 <h1>Eurovision Favourites Picker</h1>
 
@@ -217,19 +217,19 @@ var items = [
     { id: 'Boonika bate toba'  , year: "2005"},
     { id: 'The War is not Over'  , year: "2005"},
     { id: 'Tout de moi'  , year: "2005"},
-    { id: "Hasheket Shenish'ar"  , year: "2005"},
+    { id: "Hasheket Shenish'ar"  , year: "2005", final:true},
     { id: 'Love me Tonight'  , year: "2005"},
     { id: 'My Impossible Dream'  , year: "2005"},
     { id: 'If I Had Your Love'  , year: "2005"},
     { id: 'Le Grand Soir'  , year: "2005"},
     { id: "Let's Get Loud"  , year: "2005"},
-    { id: 'In My Dreams'  , year: "2005"},
+    { id: 'In My Dreams'  , year: "2005", secondChance:true},
     { id: 'Let Me Try'  , year: "2005"},
-    { id: 'Forogj, vil&#225g!'  , year: "2005"},
+    { id: 'Forogj, vil&#225g!'  , year: "2005", secondChance:true},
     { id: 'Why?'  , year: "2005"},
     { id: 'Make My Day'  , year: "2005"},
     { id: 'La mirada interior'  , year: "2005"},
-    { id: 'Cool Vibes'  , year: "2005"},
+    { id: 'Cool Vibes'  , year: "2005", secondChance:true},
     { id: 'Vukovi umiru sami'  , year: "2005"},
     { id: 'Lorraine'  , year: "2005"},
     { id: 'Love?'  , year: "2005"},
@@ -246,7 +246,7 @@ var items = [
     { id: 'Las Vegas'  , year: "2005"},
     { id: 'Razom nas bahato'  , year: "2005"},
     { id: 'Run & Hide'  , year: "2005"},
-    { id: 'My Number One'  , year: "2005"},
+    { id: 'My Number One'  , year: "2005", final:true},
     { id: 'Nobody Hurt No One'  , year: "2005"},
     { id: 'Call Me'  , year: "2005"},
     { id: 'Chacun pense &#224 soi'  , year: "2005"},
@@ -504,6 +504,18 @@ btn.addEventListener("click", function() {
     theme.href = "lightTheme.css";
   }
 });
+</script>
+
+<script>
+    function changeTheme() {
+        if(document.getElementById("toggle").innerHTML == "Toggle Light Mode"){
+            document.getElementById("toggle").innerHTML = "Toggle Dark Mode";
+        }
+        else{
+            document.getElementById("toggle").innerHTML = "Toggle Light Mode";
+        }
+
+    }
 </script>
 
 </body>
